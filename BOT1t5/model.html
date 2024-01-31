@@ -28,7 +28,8 @@
             SR = 100 * scaleFactor,
             OR = 100 * scaleFactor,
             cv = document.getElementById('cv'),
-            cx = cv.getContext('2d');
+            cx = cv.getContext('2d'),
+            currentColorIndex = 0; // Hardcoded array value
 
         cv.width = S;
         cv.height = S;
@@ -154,6 +155,7 @@
 
         
     </script>
+    <script src="colourComboArray.js"></script>
     <script src="drawObject.js"></script>
 
 </body>

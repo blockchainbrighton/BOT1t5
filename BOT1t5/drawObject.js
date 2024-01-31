@@ -18,13 +18,9 @@ cp.drawObject = function(obj, tm) {
         let angle = Math.atan2(p[0].y - S / 2, p[0].x - S / 2) * 180 / Math.PI;
         let hue = (angle + tm / 500) % 360;
 
-// The Section below is the section that needs to be modified to use the colourComboArray to use different settings for drawing each object.
-
-        cx.fillStyle = ((Math.floor(v[0].x / 0.55555) + Math.floor(v[0].y / 333)) % 666 === 0) ? 'yellow' : 'black';
+        // The Section below is now updated to use the currentColorIndex to select the color
+        cx.fillStyle = colors[currentColorIndex % colors.length];
         cx.fill();
-
-// The Section above is the section that needs to be modified to use the colourComboArray to use different settings for drawing each object.
-
 
         cx.strokeStyle = 'black';
         cx.stroke();
