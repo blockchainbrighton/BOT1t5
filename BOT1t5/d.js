@@ -16,7 +16,7 @@ cp.drawObject = function(obj, tm) {
         
         // Now, obtain colors dynamically
         let colors = getColors(angle, tm, v); // Make sure to define tm and v appropriately
-        cx.fillStyle = colors[currentColorIndex % colors.length];
+        cx.fillStyle = colors[cci % colors.length];
         cx.fill();
 
         cx.strokeStyle = 'black';
