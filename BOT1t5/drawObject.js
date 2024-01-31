@@ -11,14 +11,11 @@ cp.drawObject = function(obj, tm) {
         }
         cx.closePath();
 
-        // Calculate the mean Y position of the first 3 points for color adjustment (if needed)
-        let m = (p[0].y + p[1].y + p[2].y) / 3;
-
-        // Calculate the angle for dynamic hue changes
+        // Assuming angle, tm, and v are calculated correctly here
         let angle = Math.atan2(p[0].y - S / 2, p[0].x - S / 2) * 180 / Math.PI;
-        let hue = (angle + tm / 500) % 360;
-
-        // The Section below is now updated to use the currentColorIndex to select the color
+        
+        // Now, obtain colors dynamically
+        let colors = getColors(angle, tm, v); // Make sure to define tm and v appropriately
         cx.fillStyle = colors[currentColorIndex % colors.length];
         cx.fill();
 
@@ -26,6 +23,7 @@ cp.drawObject = function(obj, tm) {
         cx.stroke();
     }
 };
+
 
 // drawObject16.1.js
 

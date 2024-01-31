@@ -1,4 +1,5 @@
-const colors = [
+function getColors(angle, tm, v) {
+  return [
   `hsl(${(angle + 60 * Math.sin(tm / 1000)) % 360}, 100%, 50%)`,
   `hsl(${Math.random() * 360}, 100%, ${50 + 25 * Math.cos(tm / 1000)}%)`,
   ((Math.floor(v[0].x / 111) + Math.floor(v[0].y / 111)) % 8 === 0) ? '#00001E' : 'black',
@@ -19,7 +20,4 @@ const colors = [
   ((Math.floor(v[0].x / 111) + Math.floor(v[0].y / 111)) % 11 === 0) ? 'purple' : 'black'
 ];
 
-for (const color of colors) {
-  cx.fillStyle = color;
-  cx.fill();
 }
