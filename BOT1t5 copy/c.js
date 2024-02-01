@@ -164,63 +164,103 @@ Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 60)}, 100%, 50%)` : `hsl
 `rgb(${Math.floor(Math.sin(Date.now()) * 127 + 4)}, ${Math.floor(Math.sin(Date.now() / 10) * 127 + 128)}, ${Math.floor(Math.sin(Date.now() / 5000) * 127 + 32)})`,
 // #93  - RED PINK CRAZY GOGGLE EYES
 `rgb(${Math.floor(Math.sin(Date.now()) * 127 + 512)}, ${Math.floor(Math.sin(Date.now() / 1) * 127 + 128)}, ${Math.floor(Math.sin(Date.now() / 1000) * 127 + 8)})`,
-// #94 - FLASHING RED EYE
+
+//#94
+// Assuming an animation loop is calling this function repeatedly
+() => {
+  // Define base colors
+  let baseRed = 200;
+  let baseGreen = 100;
+  let baseBlue = 150;
+
+  // Oscillate colors within a narrow range to ensure visibility
+  let oscillationFactor = Math.floor(Math.random() * 10); // Small random change
+
+  // Apply oscillated colors
+  cx.fillStyle = `rgb(${(baseRed + oscillationFactor) % 255}, ${(baseGreen + oscillationFactor) % 255}, ${(baseBlue + oscillationFactor) % 255})`;
+  cx.fillRect(0, 0, S, S);
+},
+
+// #95 - FLASHING RED EYE
 `rgb(${Math.floor(Math.sin(Date.now()) * 111 + 200000)}, ${Math.floor(Math.sin(Date.now() / 1) * 127 + 12)}, ${Math.floor(Math.sin(Date.now() / 100) * 127 + 4)})`,
 
-// #95 
+// #95 - Oscillating gradient from purple to orange
 () => {
-  let oscGradient = cx.createLinearGradient(0, 0, S, S);
+  const oscGradient = cx.createLinearGradient(0, 0, S, S);
   oscGradient.addColorStop(Math.abs(Math.sin(tm / 1500)), 'purple');
   oscGradient.addColorStop(1 - Math.abs(Math.sin(tm / 1500)), 'orange');
   cx.fillStyle = oscGradient;
-  cx.fill();
+  cx.fillRect(0, 0, S, S); // Ensure to fill the correct area
 
-  // Adding logs for debugging
   console.log('Oscillation value:', Math.abs(Math.sin(tm / 1500)));
   console.log('Gradient colors:', 'purple', 'orange');
-
-  return oscGradient; // Return the oscGradient object
 },
 
-// Other configurations follow a similar pattern
+// #96
 // Example for green to cyan gradient with a slower oscillation
 () => {
-  let oscGradient = cx.createLinearGradient(0, 0, S, S);
+  const oscGradient = cx.createLinearGradient(0, 0, S, S);
   oscGradient.addColorStop(Math.abs(Math.sin(tm / 4000)), 'green');
   oscGradient.addColorStop(1 - Math.abs(Math.sin(tm / 4000)), 'cyan');
   cx.fillStyle = oscGradient;
-  cx.fill();
+  cx.fillRect(0, 0, S, S); // Adjusted to fill the canvas
 
-  // Adding logs for debugging
   console.log('Oscillation value:', Math.abs(Math.sin(tm / 4000)));
   console.log('Gradient colors:', 'green', 'cyan');
-
-  return oscGradient; // Return the oscGradient object
 },
 
+// #97
 // A gradient that oscillates from pink to yellow with medium timing
-() => { cx.createLinearGradient(0, 0, S, S).addColorStop(Math.abs(Math.sin(tm / 2500)), 'pink').addColorStop(1 - Math.abs(Math.sin(tm / 2500)), 'yellow'), cx.fillStyle = oscGradient, cx.fill() },
+() => {
+  cx.fillStyle = `hsl(${Math.abs(Math.sin(tm / 2500)) * 60}, 100%, 50%)`;
+  cx.fillRect(0, 0, S, S);
+},
 
 // Creating a sharp contrast with black and white, and very fast oscillation
-() => { cx.createLinearGradient(0, 0, S, S).addColorStop(Math.abs(Math.sin(tm / 1000)), 'black').addColorStop(1 - Math.abs(Math.sin(tm / 1000)), 'white'), cx.fillStyle = oscGradient, cx.fill() },
+() => {
+  cx.fillStyle = Math.sin(tm / 1000) > 0 ? 'black' : 'white';
+  cx.fillRect(0, 0, S, S);
+},
 
 // A serene blue to light blue gradient with gentle timing
-() => { cx.createLinearGradient(0, 0, S, S).addColorStop(Math.abs(Math.sin(tm / 5000)), 'darkblue').addColorStop(1 - Math.abs(Math.sin(tm / 5000)), 'lightblue'), cx.fillStyle = oscGradient, cx.fill() },
+() => {
+  let percent = Math.abs(Math.sin(tm / 5000));
+  cx.fillStyle = `rgb(${0 + percent * (173 - 0)}, ${0 + percent * (216 - 0)}, ${255})`; // Darkblue to light blue
+  cx.fillRect(0, 0, S, S);
+},
 
 // Vibrant red to violet transition with moderate speed
-() => { cx.createLinearGradient(0, 0, S, S).addColorStop(Math.abs(Math.sin(tm / 3000)), 'red').addColorStop(1 - Math.abs(Math.sin(tm / 3000)), 'violet'), cx.fillStyle = oscGradient, cx.fill() },
+() => {
+  cx.fillStyle = `hsl(${Math.abs(Math.sin(tm / 3000)) * 300}, 100%, 50%)`; // Red to violet
+  cx.fillRect(0, 0, S, S);
+},
 
 // A dynamic shift from teal to mint, showcasing a refreshing palette
-() => { cx.createLinearGradient(0, 0, S, S).addColorStop(Math.abs(Math.sin(tm / 3500)), 'teal').addColorStop(1 - Math.abs(Math.sin(tm / 3500)), 'mint'), cx.fillStyle = oscGradient, cx.fill() },
+() => {
+  let percent = Math.abs(Math.sin(tm / 3500));
+  cx.fillStyle = `rgb(${0 + percent * (64 - 0)}, ${128 + percent * (188 - 128)}, ${128 + percent * (128 - 128)})`; // Teal to mint
+  cx.fillRect(0, 0, S, S);
+},
 
 // Earthy tones with olive and sienna, for a natural oscillation effect
-() => { cx.createLinearGradient(0, 0, S, S).addColorStop(Math.abs(Math.sin(tm / 4500)), 'olive').addColorStop(1 - Math.abs(Math.sin(tm / 4500)), 'sienna'), cx.fillStyle = oscGradient, cx.fill() },
+() => {
+  let percent = Math.abs(Math.sin(tm / 4500));
+  cx.fillStyle = `rgb(${128 + percent * (160 - 128)}, ${128 + percent * (82 - 128)}, ${0 + percent * (45 - 0)})`; // Olive to sienna
+  cx.fillRect(0, 0, S, S);
+},
 
 // A dazzling combination of gold to silver, with a quick transition
-() => { cx.createLinearGradient(0, 0, S, S).addColorStop(Math.abs(Math.sin(tm / 2000)), 'gold').addColorStop(1 - Math.abs(Math.sin(tm / 2000)), 'silver'), cx.fillStyle = oscGradient, cx.fill() },
+() => {
+  let percent = Math.abs(Math.sin(tm / 2000));
+  cx.fillStyle = `rgb(${255}, ${215 + percent * (192 - 215)}, ${0 + percent * (192 - 0)})`; // Gold to silver
+  cx.fillRect(0, 0, S, S);
+},
 
 // Luminous neon colors from lime to magenta for a bold effect
-() => { cx.createLinearGradient(0, 0, S, S).addColorStop(Math.abs(Math.sin(tm / 2200)), 'lime').addColorStop(1 - Math.abs(Math.sin(tm / 2200)), 'magenta'), cx.fillStyle = oscGradient, cx.fill() }
+() => {
+  cx.fillStyle = `hsl(${Math.abs(Math.sin(tm / 2200)) * 300}, 100%, 50%)`; // Lime to magenta
+  cx.fillRect(0, 0, S, S);
+}
 
 ];
 }
