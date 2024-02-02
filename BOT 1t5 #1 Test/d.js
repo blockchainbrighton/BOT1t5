@@ -1,6 +1,5 @@
 // drawObject16.2.js
 
-// Updated drawObject method to sync color changes with 123 BPM
 cp.drawObject = function(obj, tm) {
     for (let f of obj.f) {
         let v = f.map((i) => obj.v[i]);
@@ -12,16 +11,12 @@ cp.drawObject = function(obj, tm) {
         }
         cx.closePath();
 
-        // Calculate the beat interval in milliseconds for 123 BPM
-        let beatDurationMs = 60000 / 123; // 60,000 ms in a minute divided by 123 BPM
-        let beatCycle = Math.floor(tm / beatDurationMs) % colors.length; // Cycle through colors based on the beat
-
         // Assuming angle, tm, and v are calculated correctly here
         let angle = Math.atan2(p[0].y - S / 2, p[0].x - S / 2) * 180 / Math.PI;
         
-        // Obtain colors dynamically, modified to use beatCycle for synchronization
-        let colors = getColors(angle, tm, v); // Adjust getColors to accept beatCycle if needed
-        cx.fillStyle = colors[beatCycle];
+        // Now, obtain colors dynamically
+        let colors = getColors(angle, tm, v); // Make sure to define tm and v appropriately
+        cx.fillStyle = colors[cci % colors.length];
         cx.fill();
 
         cx.strokeStyle = 'black';
@@ -29,7 +24,9 @@ cp.drawObject = function(obj, tm) {
     }
 };
 
-// Updated d function with timing for 123 BPM
+
+// drawObject16.1.js
+
 function d(tm) {
     cx.clearRect(0, 0, S, S);
     let a;
@@ -42,7 +39,7 @@ function d(tm) {
     t = tm;
     cp.rP(cp.c, a); // Adjust color patterns based on rotation
 
-    // Pass `tm` to `cp.drawObject` for dynamic color changes synchronized with BPM
+    // Pass `tm` to `cp.drawObject` for dynamic color changes
     cp.drawObject(cp.cy, tm);
     cp.drawObject(cp.sp1, tm);
     cp.drawObject(cp.sp2, tm);
@@ -50,4 +47,3 @@ function d(tm) {
 }
 
 requestAnimationFrame(d);
-
