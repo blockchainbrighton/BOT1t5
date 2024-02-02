@@ -1,0 +1,41 @@
+
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 22px;
+      background-color: black;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr); /* Five buttons per row */
+      gap: 10px; /* Spacing between buttons */
+      margin-top: 20px;
+    }
+    .palette-button {
+      padding: 10px;
+      cursor: pointer;
+      font-size: 90%; /* Adjusted for space */
+      font-weight: bold;
+      color: #ffffff; /* Text color for better contrast */
+      border: none; /* Remove default border */
+      border-radius: 5px; /* Rounded corners */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 110px; /* Adjusted height */
+      width: 110px;
+    }
+    .color-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .color-cell {
+      width: 220px; /* Adjusted size */
+      height: 220px;
+      margin: 10px;
+    }
+  
