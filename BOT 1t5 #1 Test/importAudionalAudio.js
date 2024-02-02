@@ -1,8 +1,5 @@
 // importAudionalAudio.js
 
-
-
-
 // Define global audio context
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -11,90 +8,140 @@ console.log(`Audio context state: ${audioCtx.state}`);
 // Function to fetch and decode audio data
 async function fetchAndDecodeAudio(url) {
     console.log('Fetching audio data from:', url);
-    
     try {
         const response = await fetch(url);
-        
         if (!response.ok) {
             console.error('Error fetching audio data:', response.statusText);
             return;
         }
-        
         const data = await response.json();
         console.log('Audio data fetched successfully');
         
-        const audioData = data.audioData.split(",")[1]; // Splitting to extract base64 encoded string
+        const audioData = data.audioData.split(",")[1]; // Extracting base64 encoded string
         const arrayBuffer = await (await fetch(`data:audio/mpeg;base64,${audioData}`)).arrayBuffer();
-
-        return audioCtx.decodeAudioData(arrayBuffer).then((decodedData) => {
-            console.log('Audio data decoded successfully');
-            return decodedData;
-        }).catch((error) => {
-            console.error('Error decoding audio data:', error);
-        });
+        return audioCtx.decodeAudioData(arrayBuffer)
+            .then((decodedData) => {
+                console.log('Audio data decoded successfully');
+                return decodedData;
+            }).catch((error) => {
+                console.error('Error decoding audio data:', error);
+            });
     } catch (error) {
         console.error('Error fetching or decoding audio data:', error);
     }
 }
 
-// Function to play the audio buffer
-function playAudioBuffer(buffer) {
-    if (!buffer) {
-        console.error('Audio buffer is null or undefined.');
+document.addEventListener('DOMContentLoaded', function() {
+    initializeAudioPlayback();
+});
+
+async function initializeAudioPlayback() {
+    console.log('Initializing audio playback...');
+    const audioBuffer = await fetchAndDecodeAudio('https://ordinals.com/content/8fa54ad2d9e297c79b225eff67a481ebc8682dacf4fe9dbf5b692a60b237c163i0');
+    console.log(`Audio buffer duration: ${audioBuffer.duration}`);
+
+    const canvas = document.getElementById('cv');
+    if (!canvas) {
+        console.error('Canvas element not found');
         return;
     }
-    console.log(`Playing audio buffer at ${audioCtx.currentTime}`);
-   
-    const source = audioCtx.createBufferSource();
-    source.buffer = buffer;
-    source.connect(audioCtx.destination);
-    source.start();
-    
-    console.log('Audio playback started');
+    console.log('Canvas element found, adding click event listener.');
+
+    canvas.addEventListener('click', async function() {
+        console.log('Canvas clicked, starting audio playback.');
+        if (audioCtx.state === 'suspended') {
+            await audioCtx.resume();
+            console.log('Audio context resumed');
+        }
+        scheduleAudioPlayback(audioBuffer, canvas.getContext('2d'));
+    });
 }
 
-// Function to schedule playing the audio sample at 123 BPM
-function scheduleAudioPlayback(audioBuffer) {
-    const beatInterval = 60 / 123; // Duration of each beat in seconds
+// Define beat interval outside of the function to ensure it's only calculated once
+const beatInterval = 60 / 123; // Duration of each beat in seconds
 
+function scheduleAudioPlayback(audioBuffer, cx) {
+    let visualUpdateRate = 1; // Can be adjusted: 1x, 2x, 4x, etc.
+    let nextVisualUpdateTime = audioCtx.currentTime;
+    
     function playLoop(startTime) {
+        // Setup audio playback
         const source = audioCtx.createBufferSource();
         source.buffer = audioBuffer;
         source.connect(audioCtx.destination);
         source.start(startTime);
+        
+        // Visual update scheduling
+        while (nextVisualUpdateTime < startTime + audioBuffer.duration) {
+            setTimeout(() => {
+                draw(); // Update visuals at each scheduled time
+            }, (nextVisualUpdateTime - audioCtx.currentTime) * 1000);
+            
+            nextVisualUpdateTime += beatInterval / visualUpdateRate;
+        }
 
-        const nextStartTime = startTime + audioBuffer.duration; // Schedule start based on buffer duration
+        // Schedule the next audio loop
+        const nextStartTime = startTime + audioBuffer.duration;
         setTimeout(() => playLoop(nextStartTime), (nextStartTime - audioCtx.currentTime) * 1000);
     }
 
     playLoop(audioCtx.currentTime);
 }
 
-
-// Main function to initialize the process
-async function initializeAudioPlayback() {
-    const audioBuffer = await fetchAndDecodeAudio('https://ordinals.com/content/8fa54ad2d9e297c79b225eff67a481ebc8682dacf4fe9dbf5b692a60b237c163i0');
-    console.log(`Audio buffer duration: ${audioBuffer.duration}`);
-
-    console.log('Adding click event listener to document for audio playback');
-    
-    document.addEventListener('click', async function(event) {
-        console.log('Document clicked, checking for IMG tag...');
-        if (event.target.classList.contains('audio-trigger')) { // Assuming 'audio-trigger' is a class name assigned to the image
-            console.log('Trigger image clicked, starting playback.');
-            scheduleAudioPlayback(audioBuffer);
+cp.drawObject = function(obj, tm) {
+    for (let f of obj.f) {
+        let v = f.map((i) => obj.v[i]);
+        let p = v.map((v) => ({ x: v.x, y: v.y }));
+        cx.beginPath();
+        cx.moveTo(p[0].x, p[0].y);
+        for (let i = 1; i < p.length; i++) {
+            cx.lineTo(p[i].x, p[i].y);
         }
+        cx.closePath();
+
+        // Assuming angle, tm, and v are calculated correctly here
+        let angle = Math.atan2(p[0].y - S / 2, p[0].x - S / 2) * 180 / Math.PI;
         
-        if (audioCtx.state === 'suspended') {
-            await audioCtx.resume();
-            console.log('Audio context resumed');
-        }
+        // Now, obtain colors dynamically
+        let colors = getColors(angle, tm, v); // Make sure to define tm and v appropriately
+        function getColors(angle, tm, v) {
+            // Corrected beat calculation based on BPM and current time
+            const beatInterval = 60 / 123; // seconds per beat
+            const beatsPassed = tm / beatInterval;
+            const dynamicModulo = Math.floor(beatsPassed % 8);
+        
+            // Dynamic color calculation based on beatsPassed and geometry
+            return [
+        
+                ((Math.floor(v[0].x / 111) + Math.floor(v[0].y / 111) + dynamicModulo) % 8 === 0) ? 'magenta' : 'black', // #10 pastel blue sliders
 
-        if (event.target.tagName === 'IMG') {
-            scheduleAudioPlayback(audioBuffer);
+            ];
         }
-    });
+        cx.fillStyle = colors[cci % colors.length];
+        cx.fill();
+
+        cx.strokeStyle = 'black';
+        cx.stroke();
+    }
+};
+
+let lastAudioTime = audioCtx.currentTime; // Moved outside to maintain state across calls
+
+
+// Function to draw/update visuals
+function draw() {
+
+    let tm = audioCtx.currentTime; // Correctly capture the current time
+    cx.clearRect(0, 0, S, S);
+    let a = (tm - lastAudioTime) * RS * 100; // Assume RS is defined and represents rotation speed
+    lastAudioTime = tm; // Update for the next frame
+
+    // Pass `tm` to `cp.drawObject` for dynamic color changes
+    cp.drawObject(cp.cy, tm);
+    cp.drawObject(cp.sp1, tm);
+    cp.drawObject(cp.sp2, tm);
+    requestAnimationFrame(draw); // Request the next animation frame
 }
 
-// Call the main function to set everything up
-initializeAudioPlayback();
+
+requestAnimationFrame(draw); // Start the animation loop
