@@ -41,8 +41,7 @@ document.addEventListener('keydown', function(event) {
   effectChanged = true;
 
 });
-
-
+//
 
 function createWaveEffect(cx, p, time, colorStop1, colorStop2) {
   let moveGradient = cx.createLinearGradient(p[0].x, p[0].y, p[1].x, p[1].y);
