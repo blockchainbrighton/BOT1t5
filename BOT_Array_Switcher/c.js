@@ -7,8 +7,10 @@ let effectChanged = false;
 function applyCurrentEffect(tm) {
   if (typeof S === 'undefined' || !cx || currentPoints.length === 0) return;
 
-  // Apply the effect
-  getColors[currentEffectIndex](cx, angle, tm, v, p); // Adjusted to pass the correct parameters
+  // // Apply the effect
+  // colorEffects_3[currentEffectIndex](cx, angle, tm, v, p); // Adjusted to pass the correct parameters
+  // console.log(`Effect ${currentEffectIndex} applied`);
+  // console.log(cx, angle, tm, v, p);
 }
   // Optionally reset the flag here if one-time application is needed
   // effectChanged = false;
@@ -92,9 +94,10 @@ cp.drawObject = function(obj, tm) {
 
       // let currentTimeInSeconds = Math.floor(tm / 60000);
    
-       colorEffects_2[currentEffectIndex](cx, currentPoints, tm, S);
+      
           // colorEffects [currentEffectIndex](cx, p, tm);
-         // getColors [currentEffectIndex] (angle, tm, v, p)
+          //colorEffects_2[currentEffectIndex](cx, currentPoints, tm, S);
+          colorEffects_3 [currentEffectIndex] (angle, tm, v, p)
       // console.log(`Canvas size 2nd log: (S): ${S}`);
 
       cx.strokeStyle = 'black';
@@ -138,7 +141,7 @@ requestAnimationFrame(d);
 
 
 // Correct definition of getColors
-const getColors = [
+const colorEffects_3 = [
   (cx, angle, tm, v, p) => {
     // Assuming you adjust the logic to use the parameters correctly
     const colorValue = Math.floor(Math.random() * 255);
