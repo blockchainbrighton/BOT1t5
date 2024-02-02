@@ -142,14 +142,22 @@ requestAnimationFrame(d);
 
 // Correct definition of getColors
 const colorEffects_3 = [
-  (cx, angle, tm, v, p) => {
-    // Assuming you adjust the logic to use the parameters correctly
-    const colorValue = Math.floor(Math.random() * 255);
+  (cx, p, tm) => {
+    // Adjust the logic to use the parameters (cx, p, tm) correctly
+    // For demonstration, let's create a grayscale wave effect
+    const colorValue = Math.floor(Math.sin(tm / 1000) * 127 + 128); // Oscillating grayscale value
     cx.fillStyle = `rgb(${colorValue}, ${colorValue}, ${colorValue})`;
     cx.fill();
   },
-  // More functions as needed
+  // You can add more functions with different effects similar to colorEffects
+  (cx, p, tm) => {
+    // Example of another color effect
+    const colorValue = Math.floor(Math.cos(tm / 1000) * 127 + 128); // Oscillating grayscale value with a different phase
+    cx.fillStyle = `rgb(${colorValue}, ${colorValue}, ${colorValue})`;
+    cx.fill();
+  },
 ];
+
 
 
 const colorEffects = [
