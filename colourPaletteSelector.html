@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel=stylesheet href=styles.css>
+<title>Color Palette Selector</title>
+</head>
+<body>
+    <div class="button-grid">
+        <!-- Optimized button placement in a grid -->
+        <button class="palette-button" onclick="displayPalette('retroFuturism')" style="background-color: #FF6AD5; color: #FF9E00">Retro Futurism</button>
+        <button class="palette-button" onclick="displayPalette('cyberpunkNeon')" style="background-color: #00FF66; color: #545454">Cyberpunk Neon</button>
+        <button class="palette-button" onclick="displayPalette('galacticExploration')" style="background-color: #007BFF; color: #FF281C">Galactic Exploration</button>
+        <button class="palette-button" onclick="displayPalette('vintageSciFi')" style="background-color: #FFD300; color: #273BE2">Vintage Sci-Fi</button>
+        <button class="palette-button" onclick="displayPalette('neonDystopia')" style="background-color: #004DFF; color: #1A1A1A">Neon Dystopia</button>
+        
+        
+        <!-- New palette buttons -->
+        <button class="palette-button" onclick="displayPalette('solarFlare')" style="background-color: #FFDD57; color: #C7432B">Solar Flare</button>
+        <button class="palette-button" onclick="displayPalette('deepOcean')" style="background-color: #005D77; color: #00DFFC">Deep Ocean</button>
+        <button class="palette-button" onclick="displayPalette('earthTones')" style="background-color: #556B2F; color: #D2B48C">Earth Tones</button>
+        <button class="palette-button" onclick="displayPalette('sunsetDreams')" style="background-color: #FF9E9D; color: #E2F0CB">Sunset Dreams</button>
+        <button class="palette-button" onclick="displayPalette('cosmicDawn')" style="background-color: #6D45E1; color: #FFFAFF">Cosmic Dawn</button>
+        <button class="palette-button" onclick="displayPalette('alienLandscape')" style="background-color: #6FBC6D; color: #005D6E">Alien Landscape</button>
+        <button class="palette-button" onclick="displayPalette('technoNeon')" style="background-color: #8AFF00; color: #7A00FF">Techno Neon</button>
+        <button class="palette-button" onclick="displayPalette('frostByte')" style="background-color: #0E577A; color: #DBF3FA">Frost Byte</button>
+        <button class="palette-button" onclick="displayPalette('starlightEcho')" style="background-color: #A5B2FF; color: #576490">Starlight Echo</button>
+        <button class="palette-button" onclick="displayPalette('digitalSunrise')" style="background-color: #FF5F6D; color: #9BF3F0">Digital Sunrise</button>
+        <button class="palette-button" onclick="displayPalette('phantomPurple')" style="background-color: #381A50; color: #F0C0E3">Phantom Purple</button>
+        <button class="palette-button" onclick="displayPalette('lunarGlow')" style="background-color: #495867; color: #fe5f55">Lunar Glow</button>
+        <button class="palette-button" onclick="displayPalette('interstellarMist')" style="background-color: #464646; color: #B1B1B1">Interstellar Mist</button>
+        <button class="palette-button" onclick="displayPalette('nebulaPink')" style="background-color: #FF0099; color: #FFFFFF">Nebula Pink</button>
+        <button class="palette-button" onclick="displayPalette('cyberSunset')" style="background-color: #FD746C; color: #FFF">Cyber Sunset</button>
+
+
+        <!--Crypto Palettes-->
+        <button class="palette-button" onclick="displayPalette('pepePalette')" style="background-color: #78AB46; color: #F0EAD6">Pepe</button>
+        <button class="palette-button" onclick="displayPalette('dogePalette')" style="background-color: #CBA135; color: #60A2FF">Doge</button>
+        <button class="palette-button" onclick="displayPalette('hodlPalette')" style="background-color: #787878; color: #0052CC">HODL</button>
+        <button class="palette-button" onclick="displayPalette('nyanCatPalette')" style="background-color: #966856; color: #A0A0A0">Nyan Cat</button>
+        <button class="palette-button" onclick="displayPalette('wojakPalette')" style="background-color: #FFCCCC; color: #77DD77">Wojak</button>
+        <button class="palette-button" onclick="displayPalette('bitcoinPalette')" style="background-color: #F7931A; color: #000000">Bitcoin</button>
+        <button class="palette-button" onclick="displayPalette('ethereumPalette')" style="background-color: #3C3C3D; color: #000000">Ethereum</button>
+        <button class="palette-button" onclick="displayPalette('stacksPalette')" style="background-color: #5546FF; color: #7F8C8D">Stacks</button>
+        <button class="palette-button" onclick="displayPalette('solanaPalette')" style="background-color: #00FFA3; color: #0A0A0A">Solana</button>
+        <button class="palette-button" onclick="displayPalette('cardanoPalette')" style="background-color: #0033AD; color: #000000">Cardano</button>
+        </div>
+      
+      <div id="colorGrid" class="color-grid">
+  <!-- Colors will be displayed here -->
+</div>
+
+<script>
+  const colorPalettes = {
+  // Various Themed Colour palettes
+  retroFuturism: ['#FF6AD5', '#00F0FF', '#101010', '#BCC6CC', '#FF9E00'],
+  cyberpunkNeon: ['#00FF66', '#7200DA', '#002DFF', '#FF0033', '#545454'],
+  galacticExploration: ['#007BFF', '#505050', '#8A2BE2', '#DEFD01', '#FF281C'],
+  vintageSciFi: ['#FFD300', '#00A36C', '#FF5500', '#A8A9AD', '#273BE2'],
+  neonDystopia: ['#004DFF', '#E40045', '#AFFF14', '#00FFD1', '#1A1A1A'],
+  solarFlare: ['#FFDD57', '#FFAB00', '#FF8800', '#FF6542', '#C7432B'],
+  deepOcean: ['#005D77', '#007D8C', '#009DAE', '#00BBD6', '#00DFFC'],
+  earthTones: ['#556B2F', '#6E7F5C', '#8F9779', '#BEBD7F', '#D2B48C'],
+  sunsetDreams: ['#FF9E9D', '#FAD0C4', '#FFD1AA', '#FFB347', '#E2F0CB'],
+  cosmicDawn: ['#6D45E1', '#957FEF', '#C7B0F9', '#EAD6FE', '#FFFAFF'],
+  alienLandscape: ['#6FBC6D', '#57A773', '#3E8E7E', '#217B7E', '#005D6E'],
+  technoNeon: ['#8AFF00', '#00FFEA', '#0091FF', '#2740FF', '#7A00FF'],
+  frostByte: ['#DBF3FA', '#A5E3E8', '#6AC3D6', '#3083A3', '#0E577A'],
+  starlightEcho: ['#F2E9E4', '#C9D6FF', '#A5B2FF', '#7796CB', '#576490'],
+  digitalSunrise: ['#FF5F6D', '#FFC371', '#FFF1A8', '#C2FFD8', '#9BF3F0'],
+  phantomPurple: ['#381A50', '#6A3882', '#A265AC', '#D293D2', '#F0C0E3'],
+  lunarGlow: ['#495867', '#577399', '#bdd5ea', '#f7f7ff', '#fe5f55'],
+  interstellarMist: ['#464646', '#626262', '#7E7E7E', '#979797', '#B1B1B1'],
+  nebulaPink: ['#FF0099', '#FF66B3', '#FF99CC', '#FFCCE5', '#FFFFFF'],
+  cyberSunset: ['#FD746C', '#FF9068', '#FFAA67', '#FFC371', '#FFF'],
+
+  // Crypto Meme Colour Palettes
+  pepePalette: ['#57873d', '#2c2dea', '#a45e2a', '#ffffff', '#000000'],
+  dogePalette: ['#CBA135', '#986024', '#F4D7B4', '#FFFFFF', '#60A2FF'],
+  hodlPalette: ['#787878', '#00A651', '#F7931A', '#E30613', '#0052CC'],
+  nyanCatPalette: ['#966856', '#FF0000', '#FFFF00', '#0000FF', '#A0A0A0'],
+  wojakPalette: ['#FFDDBB', '#AACCFF', '#FFCCCC', '#000000', '#77DD77'],
+  // Cryptocurrency Colour Palettes
+  bitcoinPalette: ['#ff9900', '#B5B5B5', '#4D4D4D', '#FFFFFF', '#000000'],
+  ethereumPalette: ['#3C3C3D', '#8A8A8A', '#627EEA', '#CCCCCC', '#000000'],
+  stacksPalette: ['#5546FF', '#FFB32A', '#FF6F45', '#000000', '#7F8C8D'],
+  solanaPalette: ['#00FFA3', '#7F8C8D', '#3498DB', '#81ECEC', '#0A0A0A'],
+  cardanoPalette: ['#0033AD', '#2CBBB9', '#00D690', '#F0EDEE', '#000000'],
+
+};
+
+
+  function displayPalette(paletteName) {
+    const palette = colorPalettes[paletteName];
+    const grid = document.getElementById('colorGrid');
+    grid.innerHTML = ''; // Clear existing colors
+
+    palette.forEach(color => {
+      const colorCell = document.createElement('div');
+      colorCell.style.backgroundColor = color;
+      colorCell.className = 'color-cell';
+      grid.appendChild(colorCell);
+    });
+  }
+</script>
+
+</body>
+</html>
