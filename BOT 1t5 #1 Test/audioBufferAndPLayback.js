@@ -1,4 +1,4 @@
-// audioBufferAndPLayback.js
+// audioBufferAndPlayback.js
 
 document.addEventListener('DOMContentLoaded', function() {
     initializeAudioPlayback();
@@ -113,3 +113,5 @@ function draw() {
 
 
 requestAnimationFrame(draw); // Start the animation loop
+
+ 
