@@ -39,8 +39,12 @@ async function fetchAndDecodeAudio(url) {
 
 // Function to play the audio buffer
 function playAudioBuffer(buffer) {
-    console.log('Playing audio buffer');
-    
+    if (!buffer) {
+        console.error('Audio buffer is null or undefined.');
+        return;
+    }
+    console.log(`Playing audio buffer at ${audioCtx.currentTime}`);
+   
     const source = audioCtx.createBufferSource();
     source.buffer = buffer;
     source.connect(audioCtx.destination);
@@ -52,21 +56,18 @@ function playAudioBuffer(buffer) {
 // Function to schedule playing the audio sample at 123 BPM
 function scheduleAudioPlayback(audioBuffer) {
     const beatInterval = 60 / 123; // Duration of each beat in seconds
-    let nextTime = audioCtx.currentTime; // Start immediately for the first time
 
-    const playLoop = () => {
-        while (nextTime < audioCtx.currentTime + 1) { // Schedule at least 1 second ahead
-            const source = audioCtx.createBufferSource();
-            source.buffer = audioBuffer;
-            source.connect(audioCtx.destination);
-            source.start(nextTime);
-            nextTime += beatInterval; // Schedule next beat
-            console.log(`Scheduling next beat at ${nextTime}`);
-        }
-        requestAnimationFrame(playLoop); // Use requestAnimationFrame for continuous scheduling
-    };
+    function playLoop(startTime) {
+        const source = audioCtx.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(audioCtx.destination);
+        source.start(startTime);
 
-    playLoop();
+        const nextStartTime = startTime + audioBuffer.duration; // Schedule start based on buffer duration
+        setTimeout(() => playLoop(nextStartTime), (nextStartTime - audioCtx.currentTime) * 1000);
+    }
+
+    playLoop(audioCtx.currentTime);
 }
 
 
@@ -79,6 +80,10 @@ async function initializeAudioPlayback() {
     
     document.addEventListener('click', async function(event) {
         console.log('Document clicked, checking for IMG tag...');
+        if (event.target.classList.contains('audio-trigger')) { // Assuming 'audio-trigger' is a class name assigned to the image
+            console.log('Trigger image clicked, starting playback.');
+            scheduleAudioPlayback(audioBuffer);
+        }
         
         if (audioCtx.state === 'suspended') {
             await audioCtx.resume();
