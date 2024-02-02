@@ -16,6 +16,21 @@ cp.drawObject = function(obj, tm) {
         
         // Now, obtain colors dynamically
         let colors = getColors(angle, tm, v); // Make sure to define tm and v appropriately
+        function getColors(angle, tm, v) {
+            // Convert tm to a beat-based timing for 123 BPM
+            const beatFraction = 60 * 12.3; // seconds per beat
+            const currentTimeInSeconds = tm; // assuming tm is in seconds
+            const currentBeatFraction = (currentTimeInSeconds % beatFraction) / beatFraction;
+        
+            // Calculate dynamicModulo for beat-based dynamic changes
+            const dynamicModulo = Math.floor((currentTimeInSeconds / beatFraction) % 8);
+          
+              // Use beatBasedTiming for dynamic color changes
+            return [
+                ((Math.floor(v[0].x / 111) + Math.floor(v[0].y / 111) + dynamicModulo) % 8 === 0) ? 'magenta' : 'black', // #10 pastel blue sliders
+
+            ];
+        }
         cx.fillStyle = colors[cci % colors.length];
         cx.fill();
 
