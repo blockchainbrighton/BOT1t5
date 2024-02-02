@@ -29,9 +29,9 @@ document.addEventListener('keydown', function(event) {
   console.log(`Before update: currentEffectIndex = ${currentEffectIndex}`);
   // Use event.key directly in your conditionals
   if (event.key === "ArrowRight") {
-      currentEffectIndex = (currentEffectIndex + 1) % colorEffects_2.length;
+      currentEffectIndex = (currentEffectIndex + 1) % colorEffects_3.length;
   } else if (event.key === "ArrowLeft") {
-      currentEffectIndex = (currentEffectIndex - 1 + colorEffects_2.length) % colorEffects_2.length;
+      currentEffectIndex = (currentEffectIndex - 1 + colorEffects_3.length) % colorEffects_3.length;
   }
   console.log(`After update: currentEffectIndex = ${currentEffectIndex}`);
   
@@ -76,39 +76,36 @@ function createWaveEffect(cx, p, time, colorStop1, colorStop2) {
  }
   // Updated drawObject method to sync color changes with 123 BPM
   // Updated cp.drawObject method to include the createWaveEffect function call
-cp.drawObject = function(obj, tm) {
-  for (let f of obj.f) {
+  cp.drawObject = function(obj, tm) {
+    for (let f of obj.f) {
       let v = f.map((i) => obj.v[i]);
       let p = v.map((v) => ({ x: v.x, y: v.y }));
-      let angle = Math.atan2(p[0].y - S / 2, p[0].x - S / 2) * 180 / Math.PI;
-
-      // Update global currentPoints with the latest p values
+      // let angle = Math.atan2(p[0].y - S / 2, p[0].x - S / 2) * 180 / Math.PI;
+  
       currentPoints = p;
-
+  
       cx.beginPath();
       cx.moveTo(p[0].x, p[0].y);
       for (let i = 1; i < p.length; i++) {
           cx.lineTo(p[i].x, p[i].y);
       }
       cx.closePath();
-
-      // let currentTimeInSeconds = Math.floor(tm / 60000);
-   
-      
-          // colorEffects [currentEffectIndex](cx, p, tm);
-          //colorEffects_2[currentEffectIndex](cx, currentPoints, tm, S);
-          colorEffects_3 [currentEffectIndex] (angle, tm, v, p)
-      // console.log(`Canvas size 2nd log: (S): ${S}`);
-
+  
+      if (typeof colorEffects_3[currentEffectIndex] === "function") {
+        colorEffects_3[currentEffectIndex](cx, p, tm); // Corrected parameters
+      } else {
+        console.error(`Effect at index ${currentEffectIndex} is not a function.`);
+      }
+  
       cx.strokeStyle = 'black';
       cx.stroke();
-     
-
-  }
+    }
+  };
+  
   // console.log(`Executing effect #${currentEffectIndex} with time ${tm} and S ${S}`);
   // console.log(`currentPoints:`, currentPoints);
   // console.log(`Canvas size S: ${S}`);
-};
+
 
 
 // Updated d function with timing for 123 BPM
@@ -140,23 +137,7 @@ requestAnimationFrame(d);
 
 
 
-// Correct definition of getColors
-const colorEffects_3 = [
-  (cx, p, tm) => {
-    // Adjust the logic to use the parameters (cx, p, tm) correctly
-    // For demonstration, let's create a grayscale wave effect
-    const colorValue = Math.floor(Math.sin(tm / 1000) * 127 + 128); // Oscillating grayscale value
-    cx.fillStyle = `rgb(${colorValue}, ${colorValue}, ${colorValue})`;
-    cx.fill();
-  },
-  // You can add more functions with different effects similar to colorEffects
-  (cx, p, tm) => {
-    // Example of another color effect
-    const colorValue = Math.floor(Math.cos(tm / 1000) * 127 + 128); // Oscillating grayscale value with a different phase
-    cx.fillStyle = `rgb(${colorValue}, ${colorValue}, ${colorValue})`;
-    cx.fill();
-  },
-];
+
 
 
 
@@ -301,196 +282,477 @@ const colorEffects_2 = [
 ];
 
 
+const colorEffects_3 = [
 
-//const getColors =
-//  [
+  // First two functions are already in the correct format
+  (cx, p, tm) => {
+    const colorValue = Math.floor(Math.random() * 255);
+    cx.fillStyle = `rgb(${colorValue}, ${colorValue}, ${colorValue})`;
+    cx.fill();
+  },
+  (cx, p, tm) => {
+    const colorCondition = ((Math.floor(p[0].x / 111) + Math.floor(p[0].y / 999)) % 3 === 0) ? 'green' : 'black';
+    cx.fillStyle = colorCondition;
+    cx.fill();
+  },
+  // Converted and updated functions
+  (cx, p, tm) => {
+    const R = 100; // Ensure R's value is correctly set based on your context
+    const z = p[0]?.z || 0; // Safely access z, providing a fallback
+    const colorValue = Math.floor(Math.random() * ((z + R) / (2 * R) * 255));
+    cx.fillStyle = colorValue > 32 ? `rgb(${colorValue},${colorValue},${colorValue})` : 'alternative-color';
+    cx.fill();
+  },
+  (cx, p, tm) => {
+    const hue = Math.floor((tm % 10000) / 10000 * 360); // Cycle hue over 10 seconds
+    cx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+    cx.fill();
+  },
+  // Simplify the repeated structure for each condition, directly using p instead of v
+  (cx, p, tm) => {
+    const R = 100; // Define R as needed
+    const conditionResult = ((Math.floor(p[0].x / 111) + Math.floor(p[0].y / 999)) % 2 === 0) ? 'yellow' : 'black';
+    cx.fillStyle = conditionResult;
+    cx.fill();
+  },
+  // Continue for each of the provided conditions
+  (cx, p, tm) => {
+    const conditionResult = ((Math.floor(p[0].x / 333) + Math.floor(p[0].y / 666)) % 2 === 0) ? 'red' : 'blue';
+    cx.fillStyle = conditionResult;
+    cx.fill();
+  },
 
-//
-//    // #79
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (6 * R) * 255)); return colorValue > 8 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//    // #79
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (6 * R) * 255)); return colorValue > 8 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//    // #79
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (6 * R) * 255)); return colorValue > 8 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//    // #79
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (6 * R) * 255)); return colorValue > 8 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//    // #79
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (6 * R) * 255)); return colorValue > 8 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//    // #75
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (2 * R) * 255)); return colorValue > 8 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//    // #74
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (2 * R) * 255)); return colorValue > 16 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//    // #73
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (2 * R) * 255)); return colorValue > 32 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//    // #72
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (2 * R) * 255)); return colorValue > 64 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//    // #76
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (3 * R) * 255)); return colorValue > 64 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (3 * R) * 255)); return colorValue > 64 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (3 * R) * 255)); return colorValue > 64 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (3 * R) * 255)); return colorValue > 64 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//
-//    
-//    
-//    // #77
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (4 * R) * 255)); return colorValue > 32 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//    // #78
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (5 * R) * 255)); return colorValue > 16 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//     // #72
-//     (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (2 * R) * 255)); return colorValue > 64 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//   
-// // #73
-// (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (2 * R) * 255)); return colorValue > 32 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//    
-//  // #74
-//  (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (2 * R) * 255)); return colorValue > 16 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//    // #75
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (2 * R) * 255)); return colorValue > 8 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//   
-//    // #79
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (6 * R) * 255)); return colorValue > 8 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//    // #79
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (6 * R) * 255)); return colorValue > 8 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//    // #79
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (6 * R) * 255)); return colorValue > 8 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//    // #79
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (6 * R) * 255)); return colorValue > 8 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//    // #79
-//    (() => { const colorValue = Math.floor(Math.random() * ((v[0].z + R) / (6 * R) * 255)); return colorValue > 8 ? `rgb(${colorValue}, ${colorValue}, ${colorValue})` : 'alternative-color'; })(),
-//    
-//  Math.floor((v[0].z + R) / (2 * R) * 255) > 128 ? `rgb(${Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255) + 50})` : 'alternative-color',
-//  Math.floor((v[0].z + R) / (2 * R) * 255) > 128 ? `rgb(${Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255) + 50})` : 'alternative-color',
-//  Math.floor((v[0].z + R) / (2 * R) * 255) > 128 ? `rgb(${Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255) + 50})` : 'alternative-color',
-//  Math.floor((v[0].z + R) / (2 * R) * 255) > 128 ? `rgb(${Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255) + 50})` : 'alternative-color',
+  (cx, p, tm) => {
+    const R = 100;
+    const z = p[0]?.z || 0;
+    const colorValue = Math.floor(Math.random() * ((z + R) / (2 * R) * 255));
+    cx.fillStyle = colorValue > 128 ? `rgb(${colorValue}, ${colorValue}, ${colorValue + 50})` : 'alternative-color';
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    const R = 100;
+    const colorValue = Math.floor((p[0]?.z + R) / (2 * R) * 255) % 255;
+    const colorValuePlus85 = (Math.floor((p[0]?.z + R) / (2 * R) * 255) + 85) % 255;
+    const colorValuePlus170 = (Math.floor((p[0]?.z + R) / (2 * R) * 255) + 170) % 255;
+    cx.fillStyle = colorValue > 128 ? `rgb(${colorValue}, ${colorValuePlus85}, ${colorValuePlus170})` : 'alternative-color';
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    const R = 100;
+    const colorCondition = Math.floor((p[0]?.z + R) / (2 * R) * 255) > 128 ? 'blue' : 'red';
+    cx.fillStyle = colorCondition;
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    const R = 100;
+    const colorValue = Math.floor((p[0]?.z + R) / (2 * R) * 255);
+    cx.fillStyle = colorValue > 128 ? `rgb(${colorValue}, 0, ${255 - colorValue})` : 'alternative-color';
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    const R = 100;
+    cx.fillStyle = `rgba(${Math.floor((p[0]?.z + R) / (2 * R) * 255)}, ${Math.floor((p[0]?.z + R) / (2 * R) * 255)}, ${Math.floor((p[0]?.z + R) / (2 * R) * 255)}, 0.5)`;
+    cx.fill();
+  },
+  
+  // DISCO BALLS
+  (cx, p, tm) => {
+    const R = 100;
+    cx.fillStyle = `rgb(${Math.floor((p[0]?.z + R) / (2 * R) * 255)}, 100, 150)`;
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    cx.fillStyle = `hsl(${Math.abs(Math.sin(tm / 2200)) * 300}, 100%, 50%)`;
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    const R = 100;
+    cx.fillStyle = Math.floor((p[0]?.z + R) / (2 * R) * 360) < 180 ? `hsl(${Math.floor((p[0]?.z + R) / (2 * R) * 360)}, 100%, 50%)` : 'alternative-color';
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    cx.fillStyle = Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 60) + 40}, 50%, 50%)` : `hsl(${Math.floor(Math.random() * 60) + 250}, 70%, 50%)`;
+    cx.fill();
+  },
+  (cx, p, tm) => {
+    cx.fillStyle = Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 60) + 220}, 80%, 50%)` : `hsl(${Math.floor(Math.random() * 60) + 30}, 90%, 50%)`;
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    cx.fillStyle = Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 50) + 90}, 40%, 40%)` : `hsl(${Math.floor(Math.random() * 30) + 40}, 60%, 50%)`;
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    cx.fillStyle = Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 60) + 180}, 70%, 50%)` : `hsl(${Math.floor(Math.random() * 40) + 10}, 90%, 60%)`;
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    cx.fillStyle = Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 50) + 70}, 100%, 50%)` : `hsl(${Math.floor(Math.random() * 50) + 20}, 100%, 50%)`;
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    cx.fillStyle = Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 60)}, 100%, 50%)` : `hsl(${Math.floor(Math.random() * 60) + 180}, 100%, 50%)`;
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    cx.fillStyle = Math.random() < 0.5 ? `#${Math.floor(Math.random() * 16777215).toString(16)}` : 'alternative-color';
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    cx.fillStyle = Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 360)}, 100%, 50%)` : `hsl(${Math.floor(Math.random() * 360)}, 30%, 50%)`;
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    cx.fillStyle = Math.random() * 360 < 180 ? `hsl(${Math.random() * 360}, 100%, ${Math.random() * 100}%)` : 'alternative-color';
+    cx.fill();
+  },
+  
+  // RGBA with random alpha and color values
+  (cx, p, tm) => {
+    const R = 100;
+    const colorValues = [...Array(3)].map(() => Math.floor(Math.random() * ((p[0]?.z + R) / (2 * R) * 255))).join(', ');
+    const alpha = Math.random().toFixed(2);
+    cx.fillStyle = `rgba(${colorValues}, ${alpha})`;
+    cx.fill();
+  },
+  
+  // RGB with random color values
+  (cx, p, tm) => {
+    const R = 100;
+    const colorValues = Array.from({length: 3}, () => Math.random() * ((p[0]?.z + R) / (2 * R) * 255)).join(',');
+    cx.fillStyle = `rgb(${colorValues})`;
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    cx.fillStyle = Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 60) + 220}, 80%, 50%)` : `hsl(${Math.floor(Math.random() * 60) + 30}, 90%, 50%)`;
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    cx.fillStyle = Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 50) + 90}, 40%, 40%)` : `hsl(${Math.floor(Math.random() * 30) + 40}, 60%, 50%)`;
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    cx.fillStyle = Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 60) + 180}, 70%, 50%)` : `hsl(${Math.floor(Math.random() * 40) + 10}, 90%, 60%)`;
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    cx.fillStyle = Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 50) + 70}, 100%, 50%)` : `hsl(${Math.floor(Math.random() * 50) + 20}, 100%, 50%)`;
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    cx.fillStyle = Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 60)}, 100%, 50%)` : `hsl(${Math.floor(Math.random() * 60) + 180}, 100%, 50%)`;
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    cx.fillStyle = Math.random() < 0.5 ? `#${Math.floor(Math.random() * 16777215).toString(16)}` : 'alternative-color';
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    cx.fillStyle = Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 360)}, 100%, 50%)` : `hsl(${Math.floor(Math.random() * 360)}, 30%, 50%)`;
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    cx.fillStyle = Math.random() * 360 < 180 ? `hsl(${Math.random() * 360}, 100%, ${Math.random() * 100}%)` : 'alternative-color';
+    cx.fill();
+  },
+  
+  // RGBA with varying alpha values
+  (cx, p, tm) => {
+    const colorValues = [...Array(3)].map(() => Math.floor(Math.random() * 255)).join(', ');
+    const alpha = Math.random().toFixed(2);
+    cx.fillStyle = `rgba(${colorValues}, ${alpha})`;
+    cx.fill();
+  },
+  
+  // RGB with random color values for "DARK EYES"
+  (cx, p, tm) => {
+    const colorValues = Array.from({length: 3}, () => Math.floor(Math.random() * 255)).join(',');
+    cx.fillStyle = `rgb(${colorValues})`;
+    cx.fill();
+  },
+  
+  (cx, p, tm) => {
+    const colorValues = Array.from({length: 3}, () => Math.floor(Math.random() * 255)).join(',');
+    cx.fillStyle = `rgb(${colorValues})`;
+    cx.fill();
+  },
+      
+  (cx, p, tm) => {
+        const R = 100; // Define R as needed
+       const colorValues = Array.from({ length: 3 }, () => Math.random() * ((p[0].z + R) / (2 * R) * 255)).join(',');
+        return `rgb(${colorValues})`;
+      },
+
+  (cx, p, tm) => {
+    const R = 100; // Define R as needed
+    const colorValues = Array.from({ length: 3 }, () => Math.random() * ((p[0].z + R) / (2 * R) * 255)).join(',');
+    return `rgb(${colorValues})`;
+  },
+  (cx, p, tm) => {
+    const R = 100; // Define R as needed
+    const colorValues = Array.from({ length: 3 }, () => Math.random() * ((p[0].z + R) / (2 * R) * 255)).join(',');
+    return `rgb(${colorValues})`;
+  },
+  (cx, p, tm) => {
+    const R = 100; // Define R as needed
+    const colorValues = Array.from({ length: 3 }, () => Math.random() * ((p[0].z + R) / (2 * R) * 255)).join(',');
+    return `rgb(${colorValues})`;
+  },
+  (cx, p, tm) => {
+    const R = 100; // Define R as needed
+    const colorValues = Array.from({ length: 3 }, () => Math.random() * ((p[0].z + R) / (2 * R) * 255)).join(',');
+    return `rgb(${colorValues})`;
+  },
+  (cx, p, tm) => {
+    const R = 100; // Define R as needed
+    return Math.floor((p[0].z + R) / (2 * R) * 255) > 128
+      ? `rgb(${Math.floor((p[0].z + R) / (2 * R) * 255)}, ${Math.floor((p[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255) + 50})`
+      : 'alternative-color';
+  },
+  (cx, p, tm) => {
+    const R = 100; // Define R as needed
+    return Math.floor((p[0].z + R) / (2 * R) * 255) > 128
+      ? `rgb(${Math.floor((p[0].z + R) / (2 * R) * 255)}, ${Math.floor((p[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255) + 50})`
+      : 'alternative-color';
+  },
+  (cx, p, tm) => {
+    const R = 100; // Define R as needed
+    return Math.floor((p[0].z + R) / (2 * R) * 255) > 128
+      ? `rgb(${Math.floor((p[0].z + R) / (2 * R) * 255)}, ${Math.floor((p[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255) + 50})`
+      : 'alternative-color';
+  },
+  (cx, p, tm) => {
+    const R = 100; // Define R as needed
+    return Math.floor((p[0].z + R) / (2 * R) * 255) > 128
+      ? `rgb(${Math.floor((p[0].z + R) / (2 * R) * 255)}, ${Math.floor((p[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255) + 50})`
+      : 'alternative-color';
+  },
+  (cx, p, tm) => {
+    const R = 100; // Define R as needed
+    const lightness = Math.random() * Math.floor((p[0].z + R) / (2 * R) * 255);
+    return lightness > 128 ? `rgb(${lightness}, ${lightness}, ${lightness})` : 'dark-mode-color';
+  },
+  (cx, p, tm) => {
+    const R = 100; // Define R as needed
+    const lightness = Math.random() * Math.floor((p[0].z + R) / (2 * R) * 255);
+    return lightness > 128 ? `rgb(${lightness}, ${lightness}, ${lightness})` : 'dark-mode-color';
+  },
+  (cx, p, tm) => {
+    const R = 100; // Define R as needed
+    const lightness = Math.random() * Math.floor((p[0].z + R) / (2 * R) * 255);
+    return lightness > 128 ? `rgb(${lightness}, ${lightness}, ${lightness})` : 'dark-mode-color';
+  },
+  (cx, p, tm) => {
+    const R = 100; // Define R as needed
+    const lightness = Math.random() * Math.floor((p[0].z + R) / (2 * R) * 255);
+    return lightness > 128 ? `rgb(${lightness}, ${lightness}, ${lightness})` : 'dark-mode-color';
+  },
+  (cx, p, tm) => {
+    const R = 100; // Define R as needed
+    return `rgb(${((p[0].z + R) / (2 * R) * 255) & 255}, ${((p[0].z + R) / (2 * R) * 255) & 255}, ${((p[0].z + R) / (2 * R) * 255) & 255})`;
+ 
+  },
+  (cx, p, tm) => {
+    const R = 100; // Define R as needed
+    return `rgb(${((p[0].z + R) / (2 * R) * 255) & 255}, ${((p[0].z + R) / (2 * R) * 255) & 255}, ${((p[0].z + R) / (2 * R) * 255) & 255})`;
+  
+  },
+  (cx, p, tm) => {
+    const R = 100; // Define R as needed
+    return `rgb(${((p[0].z + R) / (2 * R) * 255) & 255}, ${((p[0].z + R) / (2 * R) * 255) & 255}, ${((p[0].z + R) / (2 * R) * 255) & 255})`;
+  
+  },
+  (cx, p, tm) => {
+    const R = 100; // Define R as needed
+    return `rgb(${((p[0].z + R) / (2 * R) * 255) & 255}, ${((p[0].z + R) / (2 * R) * 255) & 255}, ${((p[0].z + R) / (2 * R) * 255) & 255})`;
+ 
+  },
+  (cx, p, tm) => {
+    const R = 100; // Define R as needed
+    return `rgb(${((p[0].z + R) / (2 * R) * 255) & 255}, ${((p[0].z + R) / (2 * R) * 255) & 255}, ${((p[0].z + R) / (2 * R) * 255) & 255})`;
+  
+  },
+
+      // (cx, p, tm) => {
+
+      // },
+
+      // (cx, p, tm) => {
+
+      // },
+
+      // (cx, p, tm) => {
+
+      // },
+
+      // (cx, p, tm) => {
+
+      // },
+
+      // (cx, p, tm) => {
+
+      // },
+
+];
+console.log(colorEffects_3.length)
 
 
-// PLAIN COLOURS
-// Math.floor((v[0].z + R) / (2 * R) * 255) > 128 ? `rgb(${Math.floor((v[0].z + R) / (2 * R) * 255) % 255}, ${(Math.floor((v[0].z + R) / (2 * R) * 255) + 85) % 255}, ${(Math.floor((v[0].z + R) / (2 * R) * 255) + 170) % 255})` : 'alternative-color', //#40
-// Math.floor((v[0].z + R) / (2 * R) * 255) > 128 ? (Math.floor((v[0].z + R) / (2 * R) * 255) > 128 ? 'blue' : 'red') : 'alternative-color',
-// Math.floor((v[0].z + R) / (2 * R) * 255) > 128 ? `rgb(${Math.floor((v[0].z + R) / (2 * R) * 255)}, 0, ${255 - Math.floor((v[0].z + R) / (2 * R) * 255)})` : 'alternative-color', // #46 Plain Pink
-// Math.floor((v[0].z + R) / (2 * R) * 255) > 128 ? `rgba(${Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255)}, 0.5)` : 'alternative-color', // #48 Plain pastel pink
-// Math.floor((v[0].z + R) / (2 * R) * 255) > 128 ? `rgb(${Math.floor((v[0].z + R) / (2 * R) * 255)}, 100, 150)` : 'alternative-color', // #49 Crazy Circus
-// () => { cx.fillStyle = `hsl(${Math.abs(Math.sin(tm / 2200)) * 300}, 100%, 50%)`; cx.fillRect(0, 0, S, S); },
 
-// // CRAZY EYES
-// Math.floor((v[0].z + R) / (2 * R) * 360) < 180 ? `hsl(${Math.floor((v[0].z + R) / (2 * R) * 360)}, 100%, 50%)` : 'alternative-color', // #47 Goggle Eyes
+  
+
+ 
+
+//   //FLASHING
+//   generateColorEffect(() => `hsl(${(tm % 0.125) * 180}, 100%, 50%)`), // #36 RED ORANGE FLASHING FRAMES
+//   generateColorEffect(() => `hsl(${((tm + 1) % 0.125) * 180}, 100%, 50%)`), // #37 CRAZY FLASH WARNING
+//   generateColorEffect(() => `hsl(${((tm + 18) % 9) * 40}, 100%, 50%)`), // #35 RED ORANGE FLASHING FRAMES
+//   generateColorEffect(() => `hsl(${(tm % 9) * 40}, 100%, 50%)`), // #34 - CRAZY FLASHING
+//   generateColorEffect(() => `hsl(${(tm % 18) * 20}, 100%, 50%)`), // #38 CRAZY FLASH WARNING
+//   generateColorEffect(() => `hsl(${(tm * 180) % 360}, 100%, 50%)`), // #24 SLIGHTLY DIFF FLASH
+//   generateColorEffect(() => `hsl(${(tm * 5) % 360}, 100%, 50%)`), // #276CRAZY WHITE FLASH
+//   generateColorEffect(() => `hsl(${(tm % 0.25) * 360}, 100%, 50%)`), // #28 CRAZY ORANGE FLASH
+//   generateColorEffect(() => `hsl(${(tm % 0.5) * 720}, 100%, 50%)`), // #32 CRAZY FLASHING
+//   generateColorEffect(() => `hsl(${((tm + 1) % 0.5) * 720}, 100%, 50%)`), // #33 CRAZY FLASHING
+
+//   generateColorEffect(() => `rgb(${Math.random() * 255 > 128 ? Math.floor((v[0].z + R) / (2 * R) * 255) : 100}, ${Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255)})`),
+//   generateColorEffect(() => `rgb(${Math.random() < 0.5 ? Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255) : 255}, ${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)})`),
+//   generateColorEffect(() => `var(--dynamic-color, rgb(${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)}))`),
+
+//   // Crazy frog eyes II
+//   generateColorEffect(() => `rgb(${Math.floor(Math.sin(Date.now()) * 127 + 128)}, ${Math.floor(Math.sin(Date.now() / 1000) * 127 + 128)}, ${Math.floor(Math.sin(Date.now() / 2000) * 127 + 128)})`),
+
+//   generateColorEffect(() => `hsl(${(angle + 60 * Math.sin(tm / 1000)) % 360}, 100%, 50%)`),
+
+//   // RED CENTRE
+//   generateColorEffect(() => ((Math.floor(v[0].x / 1) + Math.floor(v[0].y / 2000)) % 666 === 0) ? 'red' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 1) + Math.floor(v[0].y / 2000)) % 666 === 0) ? 'red' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 1) + Math.floor(v[0].y / 2000)) % 666 === 0) ? 'red' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 1) + Math.floor(v[0].y / 2000)) % 666 === 0) ? 'red' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 1) + Math.floor(v[0].y / 2000)) % 666 === 0) ? 'red' : 'black'),
+
+//   // Grey
+
+//   generateColorEffect(() => ((Math.floor(v[0].x / 0.0001) + Math.floor(v[0].y / 1000)) % 666 === 0) ? 'grey' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 0.0001) + Math.floor(v[0].y / 1000)) % 666 === 0) ? 'grey' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 0.0001) + Math.floor(v[0].y / 1000)) % 666 === 0) ? 'grey' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 0.0001) + Math.floor(v[0].y / 1000)) % 666 === 0) ? 'grey' : 'black'),
+
+//   // Green
+
+//   generateColorEffect(() => ((Math.floor(v[0].x / 0.01) + Math.floor(v[0].y / 1000)) % 666 === 0) ? 'green' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 0.01) + Math.floor(v[0].y / 1000)) % 666 === 0) ? 'green' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 0.01) + Math.floor(v[0].y / 1000)) % 666 === 0) ? 'green' : 'black'),
+
+// // Orange
+
+//   generateColorEffect(() => ((Math.floor(v[0].x / 0.1) + Math.floor(v[0].y / 1000)) % 111 === 0) ? 'orange' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 0.1) + Math.floor(v[0].y / 1000)) % 111 === 0) ? 'orange' : 'black'),
+
+// // Pink
+
+//   generateColorEffect(() => ((Math.floor(v[0].x / 1) + Math.floor(v[0].y / 1000)) % 111 === 0) ? 'pink' : 'black'),
 
 
-// DISCO BALLS
-// Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 60) + 40}, 50%, 50%)` : `hsl(${Math.floor(Math.random() * 60) + 250}, 70%, 50%)`, // #52 blue/brown Crazy Circus
-// Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 40) + 30}, 70%, 30%)` : `hsl(${Math.floor(Math.random() * 60) + 180}, 70%, 60%)`, // #53 Purple Orange Crazy Circus
-// Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 40) + 30}, 100%, 50%)` : `hsl(${Math.floor(Math.random() * 30) + 270}, 80%, 50%)`,// #54 red white blue Crazy Circus
-// Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 360)}, 60%, 80%)` : `hsl(${Math.floor(Math.random() * 360)}, 100%, 40%)`, // #55 Blue Orange Crazy Circus
-// Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 30) + 240}, 70%, 40%)` : `hsl(${Math.floor(Math.random() * 30) + 10}, 80%, 60%)`, // #56 Green Blue Crazy Circus
-// Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 60) + 220}, 80%, 50%)` : `hsl(${Math.floor(Math.random() * 60) + 30}, 90%, 50%)`, // #57 Yellow green Crazy Circus
-// Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 50) + 90}, 40%, 40%)` : `hsl(${Math.floor(Math.random() * 30) + 40}, 60%, 50%)`,
-// Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 60) + 180}, 70%, 50%)` : `hsl(${Math.floor(Math.random() * 40) + 10}, 90%, 60%)`, // #59 Bright yellow circus
-// Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 50) + 70}, 100%, 50%)` : `hsl(${Math.floor(Math.random() * 50) + 20}, 100%, 50%)`,
-// Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 60)}, 100%, 50%)` : `hsl(${Math.floor(Math.random() * 60) + 180}, 100%, 50%)`, // #61 Dark Blue Water Effect
-// Math.random() < 0.5 ? '#' + Math.floor(Math.random() * 16777215).toString(16) : 'alternative-color',  // #50 Crazy Circus (slightly less crazy)
-// Math.random() > 0.5 ? `hsl(${Math.floor(Math.random() * 360)}, 100%, 50%)` : `hsl(${Math.floor(Math.random() * 360)}, 30%, 50%)`, // #51 Purple Crazy Circus
-// Math.random() * 360 < 180 ? `hsl(${Math.random() * 360}, 100%, ${Math.random() * 100}%)` : 'alternative-color',
+// // Color Based on Conditions
 
-// GLASS DOSCO BALLS
-// // #65 Generating a random alpha for RGBA for semi-transparency effects - - GLASS DISCO BALLS 
-// `rgba(${[...Array(3)].map(() => Math.floor(Math.random() * ((v[0].z + R) / (2 * R) * 255))).join(', ')}, ${Math.random().toFixed(2)})`,
-// `rgba(${[...Array(3)].map(() => Math.floor(Math.random() * ((v[0].z + R) / (2 * R) * 255))).join(', ')}, ${Math.random().toFixed(2)})`,
-// `rgba(${[...Array(3)].map(() => Math.floor(Math.random() * ((v[0].z + R) / (2 * R) * 255))).join(', ')}, ${Math.random().toFixed(2)})`,
-// `rgba(${[...Array(3)].map(() => Math.floor(Math.random() * ((v[0].z + R) / (2 * R) * 255))).join(', ')}, ${Math.random().toFixed(2)})`,
-// 
-// // DARK EYES
-// // #61 Using ES6 arrow functions and template literals for a cleaner look - dark water
-// `rgb(${Array.from({length: 3}, () => Math.random() * ((v[0].z + R) / (2 * R) * 255)).join(',')})`,
-// `rgb(${Array.from({length: 3}, () => Math.random() * ((v[0].z + R) / (2 * R) * 255)).join(',')})`,
-// `rgb(${Array.from({length: 3}, () => Math.random() * ((v[0].z + R) / (2 * R) * 255)).join(',')})`,
-// `rgb(${Array.from({length: 3}, () => Math.random() * ((v[0].z + R) / (2 * R) * 255)).join(',')})`,
-// `rgb(${Array.from({length: 3}, () => Math.random() * ((v[0].z + R) / (2 * R) * 255)).join(',')})`,
+//   generateColorEffect(() => ((Math.floor(v[0].x / 111) + Math.floor(v[0].y / 111)) % 8 === 0) ? '#00001E' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 111) + Math.floor(v[0].y / 111)) % 16 === 0) ? '#00001E' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 0.0111) + Math.floor(v[0].y / 9999)) % 9999 === 0) ? 'grey' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 0.0111) + Math.floor(v[0].y / 5555)) % 9999 === 0) ? 'red' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 0.0111) + Math.floor(v[0].y / 3333)) % 9999 === 0) ? 'white' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 0.0111) + Math.floor(v[0].y / 3333)) % 9999 === 0) ? 'yellow' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 0.55555) + Math.floor(v[0].y / 333)) % 666 === 0) ? 'yellow' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 0.55555) + Math.floor(v[0].y / 30000)) % 666 === 0) ? 'red' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 1) + Math.floor(v[0].y / 111)) % 11 === 0) ? 'purple' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 11) + Math.floor(v[0].y / 111)) % 11 === 0) ? 'purple' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 111) + Math.floor(v[0].y / 111)) % 11 === 0) ? 'purple' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 111) + Math.floor(v[0].y / 111)) % 7 === 0) ? 'blue' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 111) + Math.floor(v[0].y / 999)) % 5 === 0) ? 'purple' : 'grey'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 111) + Math.floor(v[0].y / 999)) % 3 === 0) ? 'green' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 111) + Math.floor(v[0].y / 999)) % 2 === 0) ? 'yellow' : 'black'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 111) + Math.floor(v[0].y / 999)) % 2 === 0) ? 'red' : 'blue'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 333) + Math.floor(v[0].y / 666)) % 2 === 0) ? 'red' : 'blue'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 15) + Math.floor(v[0].y / 9000)) % 2 === 0) ? 'red' : 'blue'),
+//   generateColorEffect(() => ((Math.floor(v[0].x / 15) + Math.floor(v[0].y / 9000)) % 2 === 0) ? 'purple' : 'pink'),
 
-// PLAIN WHITE
-// Math.floor((v[0].z + R) / (2 * R) * 255) > 128 ? `rgb(${Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255) + 50})` : 'alternative-color',
-// Math.floor((v[0].z + R) / (2 * R) * 255) > 128 ? `rgb(${Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255) + 50})` : 'alternative-color',
-// Math.floor((v[0].z + R) / (2 * R) * 255) > 128 ? `rgb(${Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255) + 50})` : 'alternative-color',
-// Math.floor((v[0].z + R) / (2 * R) * 255) > 128 ? `rgb(${Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255) + 50})` : 'alternative-color',
-// 
+    
+//     ];
 
-// THE COOL ONE
-// Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255) > 128 ? `rgb(${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)})` : 'alternative-color', //  #44 - The Crazy One
-// Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255) > 128 ? `rgb(${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)})` : 'alternative-color', //  #44 - The Crazy One
-// Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255) > 128 ? `rgb(${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)})` : 'alternative-color', //  #44 - The Crazy One
-// Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255) > 128 ? `rgb(${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)})` : 'alternative-color', //  #44 - The Crazy One
-// Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255) > 128 ? `rgb(${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)})` : 'alternative-color', //  #44 - The Crazy One
-   
+
+//     const effectConfig = {
+//       baseColor: 'rgb',
+//       condition: (p, tm) => true, // This should always be a function returning a boolean
+//       computeColor: (p, tm) => {
+//         // Return a string that represents the color components
+//         return "255, 255, 255"; // Example placeholder
+//       },
+//       fallbackColor: 'rgb(0, 0, 0)'
+//     };
     
 
+// // A more generic effect generator
+// function generateColorEffect(effectConfig) {
+//   return (cx, p, tm) => {
+//     if (effectConfig.condition(p, tm)) {
+//       const color = effectConfig.computeColor(p, tm);
+//       cx.fillStyle = `${effectConfig.baseColor}(${color})`;
+//     } else {
+//       cx.fillStyle = effectConfig.fallbackColor;
+//     }
+//     cx.fill();
+//   };
+// }
 
+// // Define a dynamic effect using the generator
+// function generateColorEffect(effectConfig) {
+//   console.log(effectConfig); // Debugging line
+//   return (cx, p, tm) => {
+//     if (effectConfig.condition(p, tm)) { // Error line according to your report
+//       const color = effectConfig.computeColor(p, tm);
+//       cx.fillStyle = `${effectConfig.baseColor}(${color})`;
+//     } else {
+//       cx.fillStyle = effectConfig.fallbackColor;
+//     }
+//     cx.fill();
+//   };
+// }
 
+// // Assuming this setup is correct
+// const dynamicEffect = generateColorEffect({
+//   baseColor: 'rgb',
+//   condition: (p, tm) => Math.floor((p[0]?.z + R) / (2 * R) * 255) > 128,
+//   computeColor: (p, tm) => {
+//     const colorValue = Math.floor((p[0]?.z + R) / (2 * R) * 255);
+//     return `${colorValue}, ${colorValue}, ${colorValue + 50}`;
+//   },
+//   fallbackColor: 'rgb(255,0,0)'
+// });
 
-// // #67 Dynamic alternative-color based on lightness - GREY SCALE CRAZY ONE 
-// ((lightness) => lightness > 128 ? `rgb(${lightness}, ${lightness}, ${lightness})` : 'dark-mode-color')(Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)),
-// ((lightness) => lightness > 128 ? `rgb(${lightness}, ${lightness}, ${lightness})` : 'dark-mode-color')(Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)),
-// ((lightness) => lightness > 128 ? `rgb(${lightness}, ${lightness}, ${lightness})` : 'dark-mode-color')(Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)),
-// ((lightness) => lightness > 128 ? `rgb(${lightness}, ${lightness}, ${lightness})` : 'dark-mode-color')(Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)),
-// 
-// // #66 Using bitwise operators for a more compact approach - XRAY SPECS 
-// `rgb(${((v[0].z + R) / (2 * R) * 255) & 255}, ${((v[0].z + R) / (2 * R) * 255) & 255}, ${((v[0].z + R) / (2 * R) * 255) & 255})`,
-// `rgb(${((v[0].z + R) / (2 * R) * 255) & 255}, ${((v[0].z + R) / (2 * R) * 255) & 255}, ${((v[0].z + R) / (2 * R) * 255) & 255})`,
-// `rgb(${((v[0].z + R) / (2 * R) * 255) & 255}, ${((v[0].z + R) / (2 * R) * 255) & 255}, ${((v[0].z + R) / (2 * R) * 255) & 255})`,
-// `rgb(${((v[0].z + R) / (2 * R) * 255) & 255}, ${((v[0].z + R) / (2 * R) * 255) & 255}, ${((v[0].z + R) / (2 * R) * 255) & 255})`,
-// `rgb(${((v[0].z + R) / (2 * R) * 255) & 255}, ${((v[0].z + R) / (2 * R) * 255) & 255}, ${((v[0].z + R) / (2 * R) * 255) & 255})`,
+// // Ensure dynamicEffect is used correctly
+// colorEffects_3.push((cx, p, tm) => dynamicEffect(cx, p, tm));
 
-// // FLASHING STROBES
-// `hsl(${(tm % 0.125) * 180}, 100%, 50%)`,  // #36 RED ORANGE FLASHING FRAMES
-// `hsl(${((tm + 1) % 0.125) * 180}, 100%, 50%)`,  // #37 CRAZY FLASH WARNING
-// `hsl(${((tm + 18) % 9) * 40}, 100%, 50%)`,  // #35  RED ORANGE FLASHING FRAMES
-// `hsl(${(tm % 9) * 40}, 100%, 50%)`, // #34 - CRAZY FLASHING
-// 
-// `hsl(${(tm % 18) * 20}, 100%, 50%)`,  // #38 CRAZY FLASH WARNING
-// `hsl(${(tm * 180) % 360}, 100%, 50%)`,  // #24 SLIGHTLY DIFF FLASH
-// `hsl(${(tm * 5) % 360}, 100%, 50%)`,  // #276CRAZY WHITE FLASH
-// `hsl(${(tm % 0.25) * 360}, 100%, 50%)`, // #28 CRAZY ORANGE FLASH
-// `hsl(${(tm % 0.5) * 720}, 100%, 50%)`,  // #32 CRAZY FLASHING
-// `hsl(${((tm + 1) % 0.5) * 720}, 100%, 50%)`,  // #33 CRAZY FLASHING
-
-
-// // #71 Experimenting with a ternary operator inside the template literal for an alternative approach SPINNING RED BLACK EYES
-// `rgb(${Math.random() * 255 > 128 ? Math.floor((v[0].z + R) / (2 * R) * 255) : 100}, ${Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.floor((v[0].z + R) / (2 * R) * 255)})`,
-// 
-// 
-// // #68 Conditional spread for RGB values, spreading more red under certain conditions - RED BLACK DISCO BALLS 
-// `rgb(${Math.random() < 0.5 ? Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255) : 255}, ${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)})`,
-// // #69 Incorporating CSS variables for dynamic theming -  NOTHING HERE 
-// `var(--dynamic-color, rgb(${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)}, ${Math.random() * Math.floor((v[0].z + R) / (2 * R) * 255)}))`,
-// // #70 Utilizing Math.sin for a cyclic color variation -  LOVE THIS ONE - CRAZY FROG EYES II 
-// `rgb(${Math.floor(Math.sin(Date.now()) * 127 + 128)}, ${Math.floor(Math.sin(Date.now() / 1000) * 127 + 128)}, ${Math.floor(Math.sin(Date.now() / 2000) * 127 + 128)})`,
-
-
-
-
-
-
-//`hsl(${(angle + 60 * Math.sin(tm / 1000)) % 360}, 100%, 50%)`,
-//
-//// RED CENTRE
-//((Math.floor(v[0].x / 1) + Math.floor(v[0].y / 2000)) % 666 === 0) ? 'red' : 'black',
-//((Math.floor(v[0].x / 1) + Math.floor(v[0].y / 2000)) % 666 === 0) ? 'red' : 'black',
-//((Math.floor(v[0].x / 1) + Math.floor(v[0].y / 2000)) % 666 === 0) ? 'red' : 'black',
-//((Math.floor(v[0].x / 1) + Math.floor(v[0].y / 2000)) % 666 === 0) ? 'red' : 'black',
-//((Math.floor(v[0].x / 1) + Math.floor(v[0].y / 2000)) % 666 === 0) ? 'red' : 'black',
-//
-//    ((Math.floor(v[0].x / 0.0001) + Math.floor(v[0].y / 1000)) % 666 === 0) ? 'grey' : 'black',
-//    ((Math.floor(v[0].x / 0.0001) + Math.floor(v[0].y / 1000)) % 666 === 0) ? 'grey' : 'black',
-//    ((Math.floor(v[0].x / 0.0001) + Math.floor(v[0].y / 1000)) % 666 === 0) ? 'grey' : 'black',
-//    ((Math.floor(v[0].x / 0.0001) + Math.floor(v[0].y / 1000)) % 666 === 0) ? 'grey' : 'black',
-//
-//    ((Math.floor(v[0].x / 0.01) + Math.floor(v[0].y / 1000)) % 666 === 0) ? 'green' : 'black',
-//    ((Math.floor(v[0].x / 0.01) + Math.floor(v[0].y / 1000)) % 666 === 0) ? 'green' : 'black',
-//    ((Math.floor(v[0].x / 0.01) + Math.floor(v[0].y / 1000)) % 666 === 0) ? 'green' : 'black',
-//
-//    ((Math.floor(v[0].x / 0.1) + Math.floor(v[0].y / 1000)) % 111 === 0) ? 'orange' : 'black',
-//    ((Math.floor(v[0].x / 0.1) + Math.floor(v[0].y / 1000)) % 111 === 0) ? 'orange' : 'black',
-//
-//    ((Math.floor(v[0].x / 1) + Math.floor(v[0].y / 1000)) % 111 === 0) ? 'pink' : 'black',
-// 
 //
 //    ((Math.floor(v[0].x / 111) + Math.floor(v[0].y / 111)) % 8 === 0) ? '#00001E' : 'black',
 //    ((Math.floor(v[0].x / 111) + Math.floor(v[0].y / 111)) % 16 === 0) ? '#00001E' : 'black',
