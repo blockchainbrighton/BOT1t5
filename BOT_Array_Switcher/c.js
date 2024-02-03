@@ -80,8 +80,10 @@ function createWaveEffect(cx, p, time, colorStop1, colorStop2) {
     for (let f of obj.f) {
       let v = f.map((i) => obj.v[i]);
       let p = v.map((v) => ({ x: v.x, y: v.y }));
+      // Optionally calculate the angle if needed for some effects
       // let angle = Math.atan2(p[0].y - S / 2, p[0].x - S / 2) * 180 / Math.PI;
-  
+
+      // Update global currentPoints with the latest p values
       currentPoints = p;
   
       cx.beginPath();
@@ -91,16 +93,32 @@ function createWaveEffect(cx, p, time, colorStop1, colorStop2) {
       }
       cx.closePath();
   
-      if (typeof colorEffects_3[currentEffectIndex] === "function") {
-        colorEffects_3[currentEffectIndex](cx, p, tm); // Corrected parameters
-      } else {
-        console.error(`Effect at index ${currentEffectIndex} is not a function.`);
-      }
+      // Apply effect from colorEffects_3
+      //if (typeof colorEffects_3[currentEffectIndex] === "function") {
+      //  colorEffects_3[currentEffectIndex](cx, p, tm);
+      //} else {
+      //  console.error(`Effect at index ${currentEffectIndex} in colorEffects_3 is not a function.`);
+      //}
+  
+      // Uncomment the following lines to use colorEffects array instead
+      //  if (typeof colorEffects[currentEffectIndex] === "function") {
+      //    colorEffects[currentEffectIndex](cx, p, tm);
+      //  } else {
+      //    console.error(`Effect at index ${currentEffectIndex} in colorEffects is not a function.`);
+      //  }
+
+      // Uncomment the following lines to use colorEffects_2 array instead
+       if (typeof colorEffects_2[currentEffectIndex] === "function") {
+         colorEffects_2[currentEffectIndex](cx, p, tm, S); // Assuming S is defined and relevant
+       } else {
+         console.error(`Effect at index ${currentEffectIndex} in colorEffects_2 is not a function.`);
+       }
   
       cx.strokeStyle = 'black';
       cx.stroke();
     }
-  };
+};
+
   
   // console.log(`Executing effect #${currentEffectIndex} with time ${tm} and S ${S}`);
   // console.log(`currentPoints:`, currentPoints);
@@ -594,7 +612,25 @@ const colorEffects_3 = [
     return `rgb(${((p[0].z + R) / (2 * R) * 255) & 255}, ${((p[0].z + R) / (2 * R) * 255) & 255}, ${((p[0].z + R) / (2 * R) * 255) & 255})`;
   
   },
-
+  (cx, p, tm) => {
+    const R = 100; // Assuming R is defined globally or within scope
+    const colorValue = Math.floor((p[0]?.z + R) / (2 * R) * 255);
+    cx.fillStyle = colorValue > 128 ? `rgb(${colorValue}, ${colorValue}, ${colorValue + 50})` : 'alternative-color';
+    cx.fill();
+  },
+  (cx, p, tm) => {
+    const R = 100; // Adjust based on your context
+    const lightness = Math.random() * Math.floor((p[0]?.z + R) / (2 * R) * 255);
+    cx.fillStyle = lightness > 128 ? `rgb(${lightness}, ${lightness}, ${lightness})` : 'dark-mode-color';
+    cx.fill();
+  },
+  (cx, p, tm) => {
+    const R = 100; // Define R appropriately
+    const baseVal = Math.floor((p[0]?.z + R) / (2 * R) * 255);
+    cx.fillStyle = `rgb(${baseVal & 255}, ${baseVal & 255}, ${baseVal & 255})`;
+    cx.fill();
+  },
+      
       // (cx, p, tm) => {
 
       // },
